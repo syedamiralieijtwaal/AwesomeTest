@@ -1,9 +1,7 @@
-
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
     View,
     Text,
-    TextInput,
     TouchableOpacity,
     StyleSheet,
     Alert,
@@ -13,23 +11,27 @@ import Input from '../components/Input';
 import { useAuth } from '../context/AuthContext';
 
 const LoginScreen = ({ navigation }: any) => {
-
     const { login } = useAuth();
-    const [password, setPassword] = useState('');
-    const [email, setEmail] = useState('');
+
+    // UI state ONLY
     const [errors, setErrors] = useState<any>({});
     const [secure, setSecure] = useState(true);
+    const [hasPassword, setHasPassword] = useState(false);
 
-    const onPressSignup = () => {
-        navigation.navigate('Register');
-    };
+    // Form data refs
+    const emailRef = useRef('');
+    const passwordRef = useRef('');
 
     const validate = () => {
         const newErrors: any = {};
+        const email = emailRef.current.trim();
+        const password = passwordRef.current;
 
-        if (!email.trim()) {
+        if (!email) {
             newErrors.email = 'Email is required';
-        } else if (!/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(email)) {
+        } else if (
+            !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(email)
+        ) {
             newErrors.email = 'Enter a valid email';
         }
 
@@ -46,8 +48,11 @@ const LoginScreen = ({ navigation }: any) => {
     const onLogin = async () => {
         if (!validate()) return;
 
-        // navigation.replace('Home');
-        const success = await login(email, password);
+        const success = await login(
+            emailRef.current.trim(),
+            passwordRef.current
+        );
+
         if (!success) {
             Alert.alert('Invalid credentials');
         }
@@ -60,26 +65,35 @@ const LoginScreen = ({ navigation }: any) => {
                 <View style={styles.header}>
                     <Text style={styles.loginText}>LOGIN</Text>
                     <Text style={styles.divider}> / </Text>
-                    <TouchableOpacity onPress={onPressSignup}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Register')}>
                         <Text style={styles.signupText}>Sign Up</Text>
                     </TouchableOpacity>
                 </View>
 
+                {/* Email */}
                 <Input
                     placeholder="Email"
                     keyboardType="email-address"
-                    value={email}
-                    onChangeText={setEmail}
+                    onChangeText={text => {
+                        emailRef.current = text;
+                    }}
                 />
                 {errors.email && <Text style={styles.error}>{errors.email}</Text>}
 
+                {/* Password */}
                 <Input
                     placeholder="Password"
-                    secure
-                    value={password}
-                    onChangeText={setPassword}
+                    secure={secure}
+                    onChangeText={text => {
+                        passwordRef.current = text;
+                        setHasPassword(text.length > 0);
+                    }}
+                    rightLabel={hasPassword ? (secure ? 'Show' : 'Hide') : undefined}
+                    onRightPress={() => setSecure(prev => !prev)}
                 />
-                {errors.password && <Text style={styles.error}>{errors.password}</Text>}
+                {errors.password && (
+                    <Text style={styles.error}>{errors.password}</Text>
+                )}
 
                 {/* Button */}
                 <TouchableOpacity onPress={onLogin} style={styles.button}>
@@ -91,6 +105,7 @@ const LoginScreen = ({ navigation }: any) => {
 };
 
 export default LoginScreen;
+
 
 const styles = StyleSheet.create({
     container: {

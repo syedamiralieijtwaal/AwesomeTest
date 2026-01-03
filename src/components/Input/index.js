@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     View,
     TextInput,
@@ -8,45 +8,37 @@ import {
 } from 'react-native';
 
 type InputProps = {
-    value: string;
-    onChangeText: (text: string) => void;
     placeholder?: string;
+    keyboardType?: any;
     secure?: boolean;
-    keyboardType?: 'default' | 'email-address' | 'number-pad';
-    autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
-    containerStyle?: any;
-    inputStyle?: any;
+    onChangeText?: (text: string) => void;
+    rightLabel?: string;
+    onRightPress?: () => void;
 };
 
-const Input: React.FC<InputProps> = ({
-    value,
-    onChangeText,
+const Input = ({
     placeholder,
-    secure = false,
-    keyboardType = 'default',
-    autoCapitalize = 'none',
-    style,
-}) => {
-    const [isSecure, setIsSecure] = useState(secure);
-
+    keyboardType,
+    secure,
+    onChangeText,
+    rightLabel,
+    onRightPress,
+}: InputProps) => {
     return (
-        <View style={[styles.container, style]}>
+        <View style={styles.container}>
             <TextInput
-                value={value}
-                onChangeText={onChangeText}
                 placeholder={placeholder}
                 placeholderTextColor="#9E9E9E"
-                secureTextEntry={secure && isSecure}
                 keyboardType={keyboardType}
-                autoCapitalize={autoCapitalize}
+                secureTextEntry={secure}
+                onChangeText={onChangeText}
                 style={styles.input}
+                autoCapitalize='none'
             />
 
-            {secure && value.length > 0 && (
-                <TouchableOpacity onPress={() => setIsSecure(!isSecure)}>
-                    <Text style={styles.eyeText}>
-                        {isSecure ? 'Show' : 'Hide'}
-                    </Text>
+            {rightLabel && (
+                <TouchableOpacity onPress={onRightPress}>
+                    <Text style={styles.rightText}>{rightLabel}</Text>
                 </TouchableOpacity>
             )}
         </View>
@@ -59,21 +51,19 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 12,
-        height: 48,
+        borderBottomWidth: 1,
+        borderBottomColor: '#DADADA',
+        marginBottom: 30,
     },
     input: {
         flex: 1,
-        borderBottomWidth: 1,
-        borderBottomColor: '#DADADA',
         paddingVertical: 10,
         fontSize: 16,
         color: '#2C2C2C',
     },
-    eyeText: {
-        color: '#007AFF',
-        fontWeight: '500',
-        paddingHorizontal: 6,
+    rightText: {
+        color: '#4F6EF7',
+        fontWeight: '600',
+        paddingLeft: 10,
     },
 });
-

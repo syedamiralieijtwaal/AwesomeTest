@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
     View,
     Text,
-    TextInput,
     TouchableOpacity,
     StyleSheet,
 } from 'react-native';
@@ -11,22 +10,30 @@ import Input from '../components/Input';
 import { useAuth } from '../context/AuthContext';
 
 const RegisterScreen = ({ navigation }: any) => {
-
     const { register } = useAuth();
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+
+    // UI state only
     const [secure, setSecure] = useState(true);
+    const [hasPassword, setHasPassword] = useState(false);
     const [errors, setErrors] = useState<any>({});
+
+    // Form refs
+    const nameRef = useRef('');
+    const emailRef = useRef('');
+    const passwordRef = useRef('');
 
     const validate = () => {
         const newErrors: any = {};
 
-        if (!name.trim()) {
+        const name = nameRef.current.trim();
+        const email = emailRef.current.trim();
+        const password = passwordRef.current;
+
+        if (!name) {
             newErrors.name = 'Name is required';
         }
 
-        if (!email.trim()) {
+        if (!email) {
             newErrors.email = 'Email is required';
         } else if (!/^\S+@\S+\.\S+$/.test(email)) {
             newErrors.email = 'Enter a valid email';
@@ -45,13 +52,11 @@ const RegisterScreen = ({ navigation }: any) => {
     const onRegister = async () => {
         if (!validate()) return;
 
-        // API call goes here
-        // navigation.replace('Home');
-        await register(email, password, name);
-    };
-
-    const onPressLogin = () => {
-        navigation.goBack()
+        await register(
+            emailRef.current.trim(),
+            passwordRef.current,
+            nameRef.current.trim()
+        );
     };
 
     return (
@@ -61,7 +66,7 @@ const RegisterScreen = ({ navigation }: any) => {
                 <View style={styles.header}>
                     <Text style={styles.loginText}>SIGN UP</Text>
                     <Text style={styles.divider}> / </Text>
-                    <TouchableOpacity onPress={onPressLogin}>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
                         <Text style={styles.signupText}>Login</Text>
                     </TouchableOpacity>
                 </View>
@@ -69,8 +74,9 @@ const RegisterScreen = ({ navigation }: any) => {
                 {/* Name */}
                 <Input
                     placeholder="Name"
-                    value={name}
-                    onChangeText={setName}
+                    onChangeText={text => {
+                        nameRef.current = text;
+                    }}
                 />
                 {errors.name && <Text style={styles.error}>{errors.name}</Text>}
 
@@ -78,19 +84,26 @@ const RegisterScreen = ({ navigation }: any) => {
                 <Input
                     placeholder="Email"
                     keyboardType="email-address"
-                    value={email}
-                    onChangeText={setEmail}
+                    onChangeText={text => {
+                        emailRef.current = text;
+                    }}
                 />
                 {errors.email && <Text style={styles.error}>{errors.email}</Text>}
 
                 {/* Password */}
                 <Input
                     placeholder="Password"
-                    secure
-                    value={password}
-                    onChangeText={setPassword}
+                    secure={secure}
+                    onChangeText={text => {
+                        passwordRef.current = text;
+                        setHasPassword(text.length > 0);
+                    }}
+                    rightLabel={hasPassword ? (secure ? 'Show' : 'Hide') : undefined}
+                    onRightPress={() => setSecure(prev => !prev)}
                 />
-                {errors.password && <Text style={styles.error}>{errors.password}</Text>}
+                {errors.password && (
+                    <Text style={styles.error}>{errors.password}</Text>
+                )}
 
                 {/* Button */}
                 <TouchableOpacity style={styles.button} onPress={onRegister}>
@@ -109,6 +122,7 @@ const RegisterScreen = ({ navigation }: any) => {
 };
 
 export default RegisterScreen;
+
 
 const styles = StyleSheet.create({
     container: {
