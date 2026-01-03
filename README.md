@@ -1,97 +1,129 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+React Native Authentication App
 
-# Getting Started
+A simple React Native authentication flow using Context API, React Navigation, and AsyncStorage.
+This project demonstrates local user registration, login validation, persisted user data, and logout handling — without a backend.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+Features
 
-## Step 1: Start Metro
+Login with email & password
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+Register user locally (name, email, password)
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+Persist user data using AsyncStorage
 
-```sh
-# Using npm
-npm start
+Logout clears authentication state
 
-# OR using Yarn
-yarn start
-```
+Conditional navigation based on authentication
 
-## Step 2: Build and run your app
+Simple navigation with only three screens
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+Clean and minimal architecture
 
-### Android
+Screens
 
-```sh
-# Using npm
-npm run android
+LoginScreen
 
-# OR using Yarn
-yarn android
-```
+RegisterScreen
 
-### iOS
+HomeScreen
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+No additional screens are used.
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+Tech Stack
 
-```sh
-bundle install
-```
+React Native
 
-Then, and every time you update your native dependencies, run:
+React Navigation (Native Stack)
 
-```sh
-bundle exec pod install
-```
+Context API
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+AsyncStorage
 
-```sh
-# Using npm
-npm run ios
+TypeScript
 
-# OR using Yarn
-yarn ios
-```
+Project Structure
+src/
+├── components/
+│   └── AppInput.tsx
+│
+├── context/
+│   └── AuthContext.tsx
+│
+├── navigation/
+│   └── AppNavigator.tsx
+│
+├── screens/
+│   ├── LoginScreen.tsx
+│   ├── RegisterScreen.tsx
+│   └── HomeScreen.tsx
+│
+└── App.tsx
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+Authentication Logic (How It Works)
+Registration
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+Saves name, email, and password in AsyncStorage
 
-## Step 3: Modify your app
+Sets user in context
 
-Now that you have successfully run the app, let's make changes!
+Navigates to Home screen
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+Login
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+Reads saved user from AsyncStorage
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+Compares entered email & password
 
-## Congratulations! :tada:
+If matched, sets user in context
 
-You've successfully run and modified your React Native App. :partying_face:
+Navigates to Home screen
 
-### Now what?
+Logout
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+Clears user from context
 
-# Troubleshooting
+Does not remove registered user data
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+Navigates back to Login screen
 
-# Learn More
+App Reload Behavior
 
-To learn more about React Native, take a look at the following resources:
+On app refresh, stored user data may still exist
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Authentication depends on context state
+
+No automatic session restoration is implemented
+
+AsyncStorage Usage
+
+Stored data includes:
+
+{
+  name: string;
+  email: string;
+  password: string;
+}
+
+
+Stored under a single user key.
+
+Installation
+npm install
+cd ios && pod install
+
+
+Run the app:
+
+npx react-native run-ios
+# or
+npx react-native run-android
+
+Important Notes
+
+Passwords are stored in plain text (for demo purposes only)
+
+This approach is not suitable for production
+
+No backend or encryption is used
+
+Intended for learning and prototyping
