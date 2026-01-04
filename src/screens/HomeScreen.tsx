@@ -17,7 +17,10 @@ const HomeScreen = ({ navigation }: Props) => {
 
     const onLogout = () => {
         logout();
-        navigation.replace('Login');
+        navigation.reset({
+            index: 0,
+            routes: [{ name: 'Login' }],
+        });
     };
 
     return (

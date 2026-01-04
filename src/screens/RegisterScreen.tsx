@@ -4,6 +4,9 @@ import {
     Text,
     TouchableOpacity,
     StyleSheet,
+    ScrollView,
+    KeyboardAvoidingView,
+    Platform,
 } from 'react-native';
 
 import Input from '../components/Input';
@@ -60,76 +63,90 @@ const RegisterScreen = ({ navigation }: any) => {
     };
 
     return (
-        <View style={styles.container}>
-            <View style={styles.card}>
-                {/* Header */}
-                <View style={styles.header}>
-                    <Text style={styles.loginText}>SIGN UP</Text>
-                    <Text style={styles.divider}> / </Text>
+        <KeyboardAvoidingView
+            style={styles.root}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={styles.card}>
+                    {/* Header */}
+                    <View style={styles.header}>
+                        <Text style={styles.loginText}>SIGN UP</Text>
+                        <Text style={styles.divider}> / </Text>
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Text style={styles.signupText}>Login</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Name */}
+                    <Input
+                        placeholder="Name"
+                        onChangeText={text => {
+                            nameRef.current = text;
+                        }}
+                    />
+                    {errors.name && <Text style={styles.error}>{errors.name}</Text>}
+
+                    {/* Email */}
+                    <Input
+                        placeholder="Email"
+                        keyboardType="email-address"
+                        onChangeText={text => {
+                            emailRef.current = text;
+                        }}
+                    />
+                    {errors.email && <Text style={styles.error}>{errors.email}</Text>}
+
+                    {/* Password */}
+                    <Input
+                        placeholder="Password"
+                        secure={secure}
+                        onChangeText={text => {
+                            passwordRef.current = text;
+                            setHasPassword(text.length > 0);
+                        }}
+                        rightLabel={hasPassword ? (secure ? 'Show' : 'Hide') : undefined}
+                        onRightPress={() => setSecure(prev => !prev)}
+                    />
+                    {errors.password && (
+                        <Text style={styles.error}>{errors.password}</Text>
+                    )}
+
+                    {/* Button */}
+                    <TouchableOpacity style={styles.button} onPress={onRegister}>
+                        <Text style={styles.buttonText}>Register</Text>
+                    </TouchableOpacity>
+
+                    {/* Footer */}
                     <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <Text style={styles.signupText}>Login</Text>
+                        <Text style={styles.footerText}>
+                            Already have an account? Login
+                        </Text>
                     </TouchableOpacity>
                 </View>
-
-                {/* Name */}
-                <Input
-                    placeholder="Name"
-                    onChangeText={text => {
-                        nameRef.current = text;
-                    }}
-                />
-                {errors.name && <Text style={styles.error}>{errors.name}</Text>}
-
-                {/* Email */}
-                <Input
-                    placeholder="Email"
-                    keyboardType="email-address"
-                    onChangeText={text => {
-                        emailRef.current = text;
-                    }}
-                />
-                {errors.email && <Text style={styles.error}>{errors.email}</Text>}
-
-                {/* Password */}
-                <Input
-                    placeholder="Password"
-                    secure={secure}
-                    onChangeText={text => {
-                        passwordRef.current = text;
-                        setHasPassword(text.length > 0);
-                    }}
-                    rightLabel={hasPassword ? (secure ? 'Show' : 'Hide') : undefined}
-                    onRightPress={() => setSecure(prev => !prev)}
-                />
-                {errors.password && (
-                    <Text style={styles.error}>{errors.password}</Text>
-                )}
-
-                {/* Button */}
-                <TouchableOpacity style={styles.button} onPress={onRegister}>
-                    <Text style={styles.buttonText}>Register</Text>
-                </TouchableOpacity>
-
-                {/* Footer */}
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Text style={styles.footerText}>
-                        Already have an account? Login
-                    </Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
+
 };
 
 export default RegisterScreen;
 
 
 const styles = StyleSheet.create({
-    container: {
+    root: {
         flex: 1,
-        backgroundColor: '#4F6EF7',
+        backgroundColor: '#4F6EF7', // MUST be here
+    },
+    scrollContent: {
+        flexGrow: 1,                 // critical for Android
         justifyContent: 'center',
         alignItems: 'center',
+        paddingVertical: 24,
     },
     card: {
         width: '85%',

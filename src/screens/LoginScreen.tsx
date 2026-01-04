@@ -5,6 +5,9 @@ import {
     TouchableOpacity,
     StyleSheet,
     Alert,
+    ScrollView,
+    KeyboardAvoidingView,
+    Platform,
 } from 'react-native';
 
 import Input from '../components/Input';
@@ -13,12 +16,10 @@ import { useAuth } from '../context/AuthContext';
 const LoginScreen = ({ navigation }: any) => {
     const { login } = useAuth();
 
-    // UI state ONLY
     const [errors, setErrors] = useState<any>({});
     const [secure, setSecure] = useState(true);
     const [hasPassword, setHasPassword] = useState(false);
 
-    // Form data refs
     const emailRef = useRef('');
     const passwordRef = useRef('');
 
@@ -58,61 +59,80 @@ const LoginScreen = ({ navigation }: any) => {
         }
     };
 
+    const onRegister = () => {
+        console.log('Register');
+        navigation.navigate('Register');
+    };
+
     return (
-        <View style={styles.container}>
-            <View style={styles.card}>
-                {/* Header */}
-                <View style={styles.header}>
-                    <Text style={styles.loginText}>LOGIN</Text>
-                    <Text style={styles.divider}> / </Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-                        <Text style={styles.signupText}>Sign Up</Text>
+        <KeyboardAvoidingView
+            style={styles.root}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={styles.card}>
+                    {/* Header */}
+                    <View style={styles.header}>
+                        <Text style={styles.loginText}>LOGIN</Text>
+                        <Text style={styles.divider}> / </Text>
+                        <TouchableOpacity onPress={onRegister}>
+                            <Text style={styles.signupText}>Sign Up</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Email */}
+                    <Input
+                        placeholder="Email"
+                        keyboardType="email-address"
+                        onChangeText={text => {
+                            emailRef.current = text;
+                        }}
+                    />
+                    {errors.email && <Text style={styles.error}>{errors.email}</Text>}
+
+                    {/* Password */}
+                    <Input
+                        placeholder="Password"
+                        secure={secure}
+                        onChangeText={text => {
+                            passwordRef.current = text;
+                            setHasPassword(text.length > 0);
+                        }}
+                        rightLabel={hasPassword ? (secure ? 'Show' : 'Hide') : undefined}
+                        onRightPress={() => setSecure(prev => !prev)}
+                    />
+                    {errors.password && (
+                        <Text style={styles.error}>{errors.password}</Text>
+                    )}
+
+                    {/* Button */}
+                    <TouchableOpacity onPress={onLogin} style={styles.button}>
+                        <Text style={styles.buttonText}>Login</Text>
                     </TouchableOpacity>
                 </View>
-
-                {/* Email */}
-                <Input
-                    placeholder="Email"
-                    keyboardType="email-address"
-                    onChangeText={text => {
-                        emailRef.current = text;
-                    }}
-                />
-                {errors.email && <Text style={styles.error}>{errors.email}</Text>}
-
-                {/* Password */}
-                <Input
-                    placeholder="Password"
-                    secure={secure}
-                    onChangeText={text => {
-                        passwordRef.current = text;
-                        setHasPassword(text.length > 0);
-                    }}
-                    rightLabel={hasPassword ? (secure ? 'Show' : 'Hide') : undefined}
-                    onRightPress={() => setSecure(prev => !prev)}
-                />
-                {errors.password && (
-                    <Text style={styles.error}>{errors.password}</Text>
-                )}
-
-                {/* Button */}
-                <TouchableOpacity onPress={onLogin} style={styles.button}>
-                    <Text style={styles.buttonText}>Login</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
+
 };
 
 export default LoginScreen;
 
 
 const styles = StyleSheet.create({
-    container: {
+    root: {
         flex: 1,
         backgroundColor: '#4F6EF7',
+    },
+    scrollContent: {
+        flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        paddingVertical: 24,
     },
     card: {
         width: '85%',
